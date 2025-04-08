@@ -69,7 +69,7 @@ async def app():
         layout="centered" 
     )
     
-    # 设置页面样式
+    # Set page style
     st.markdown("""
     <style>
     .main .block-container {
@@ -159,7 +159,7 @@ async def app():
 
     with st.container():
         st.markdown('<div class="title"><h1>WebThinker</h1></div>', unsafe_allow_html=True)
-        query = st.text_input("Enter your question：", "", key="query_input")
+        query = st.text_input("Enter your question:", "", key="query_input")
 
     if query:
         print(f"Processing query: {query}")
@@ -215,7 +215,7 @@ async def app():
                                 ))
 
                             thinking_container.markdown(f'<div class="thinking-completed">{summarized_process}</div>', unsafe_allow_html=True)
-                            answer_container.markdown(f'<div class="answer-section"><h3>🎯 Final Answer：</h3>{final_answer}</div>', unsafe_allow_html=True)
+                            answer_container.markdown(f'<div class="answer-section"><h3>🎯 Final Answer:</h3>{final_answer}</div>', unsafe_allow_html=True)
 
                         else:
                             newline_count = current_chain.count('\n\n')
@@ -232,7 +232,7 @@ async def app():
                         thinking_process += chunk
                         final_answer += chunk
                         thinking_container.markdown(f'<div class="thinking-completed">{summarized_process}</div>', unsafe_allow_html=True)
-                        answer_container.markdown(f'<div class="answer-section"><h3>🎯 Final Answer：</h3>{final_answer}</div>', unsafe_allow_html=True)
+                        answer_container.markdown(f'<div class="answer-section"><h3>🎯 Final Answer:</h3>{final_answer}</div>', unsafe_allow_html=True)
 
                     search_pattern = r'<\|begin_search_query\|>.*?<\|end_search_query\|>'
                     click_pattern = r'<\|begin_click_link\|>.*?<\|end_click_link\|>'
@@ -264,7 +264,7 @@ async def app():
                 sidebar_container.markdown(thinking_process + '\n\n---\n\nFinished!')
                 thinking_container.markdown(summarized_process)
                 if final_answer:
-                    answer_container.markdown(f'<div class="answer-section"><h3>🎯 Final Answer：</h3>{final_answer}</div>', unsafe_allow_html=True)
+                    answer_container.markdown(f'<div class="answer-section"><h3>🎯 Final Answer:</h3>{final_answer}</div>', unsafe_allow_html=True)
             
             thinking_status.empty()
             

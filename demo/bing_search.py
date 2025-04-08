@@ -55,31 +55,29 @@ error_indicators = [
 class WebParserClient:
     def __init__(self, base_url: str = "http://localhost:8000"):
         """
-        初始化Web解析器客户端
+        Initialize the Web Parser Client
         
         Args:
-            base_url: API服务器的基础URL，默认为本地测试服务器
+            base_url: Base URL of the API server, defaults to local test server
         """
         self.base_url = base_url.rstrip('/')
         
-    def parse_urls(self, urls: List[str], timeout: int = 120) -> List[Dict[str, Union[str, bool]]]:
+    def parse_urls(self, urls: List[str]) -> List[Dict[str, Union[str, bool]]]:
         """
-        发送URL列表到解析服务器并获取解析结果
+        Send URL list to parsing server and get parsing results
         
         Args:
-            urls: 需要解析的URL列表
-            timeout: 请求超时时间，默认20秒
+            urls: List of URLs to parse
             
         Returns:
-            解析结果列表
-            
+            List of parsing results
+        
         Raises:
-            requests.exceptions.RequestException: 当API请求失败时
-            requests.exceptions.Timeout: 当请求超时时
+            requests.exceptions.RequestException: When API request fails
         """
         endpoint = urljoin(self.base_url, "/parse_urls")
-        response = requests.post(endpoint, json={"urls": urls}, timeout=timeout)
-        response.raise_for_status()  # 如果响应状态码不是200，抛出异常
+        response = requests.post(endpoint, json={"urls": urls}, timeout=120)
+        response.raise_for_status()  # Raise exception if response status code is not 200
         
         return response.json()["results"]
 
@@ -178,9 +176,9 @@ def extract_text_from_url(url, use_jina=False, jina_api_key=None, snippet: Optio
                 response = session.get(url, timeout=30)
                 response.raise_for_status()
                 
-                # 添加编码检测和处理
+                # Add encoding detection and handling
                 if response.encoding.lower() == 'iso-8859-1':
-                    # 尝试从内容检测正确的编码
+                    # Try to detect correct encoding from content
                     response.encoding = response.apparent_encoding
                 
                 try:
@@ -444,11 +442,11 @@ async def bing_web_search_async(query, subscription_key, endpoint, market='en-US
 class RateLimiter:
     def __init__(self, rate_limit: int, time_window: int = 60):
         """
-        初始化速率限制器
+        Initialize rate limiter
         
         Args:
-            rate_limit: 在时间窗口内允许的最大请求数
-            time_window: 时间窗口大小(秒)，默认60秒
+            rate_limit: Maximum number of requests allowed within the time window
+            time_window: Time window size (seconds), default 60 seconds
         """
         self.rate_limit = rate_limit
         self.time_window = time_window
@@ -457,7 +455,7 @@ class RateLimiter:
         self.lock = asyncio.Lock()
 
     async def acquire(self):
-        """获取一个令牌，如果没有可用令牌则等待"""
+        """Get a token, wait if no tokens are available"""
         async with self.lock:
             while self.tokens <= 0:
                 now = time.time()
@@ -468,13 +466,13 @@ class RateLimiter:
                 )
                 self.last_update = now
                 if self.tokens <= 0:
-                    await asyncio.sleep(random.randint(5, 30))  # 等待xxx秒后重试
+                    await asyncio.sleep(random.randint(5, 30))  # Wait xxx seconds before retrying
             
             self.tokens -= 1
             return True
 
-# 创建全局速率限制器实例
-jina_rate_limiter = RateLimiter(rate_limit=130)  # 每分钟xxx次，避免报错
+# Create global rate limiter instance
+jina_rate_limiter = RateLimiter(rate_limit=130)  # xxx times per minute, to avoid errors
 
 async def extract_text_from_url_async(url: str, session: aiohttp.ClientSession, use_jina: bool = False, 
                                     jina_api_key: Optional[str] = None, snippet: Optional[str] = None, 
@@ -482,7 +480,7 @@ async def extract_text_from_url_async(url: str, session: aiohttp.ClientSession, 
     """Async version of extract_text_from_url"""
     try:
         if use_jina:
-            # 在调用jina之前获取令牌
+            # Get token before calling jina
             await jina_rate_limiter.acquire()
             
             jina_headers = {
@@ -502,20 +500,20 @@ async def extract_text_from_url_async(url: str, session: aiohttp.ClientSession, 
                 return text[:10000]
 
             async with session.get(url) as response:
-                # 检测和处理编码
+                # Detect and handle encoding
                 content_type = response.headers.get('content-type', '').lower()
                 if 'charset' in content_type:
                     charset = content_type.split('charset=')[-1]
                     html = await response.text(encoding=charset)
                 else:
-                    # 如果没有指定编码，先用bytes读取内容
+                    # If no encoding is specified, first read the content as bytes
                     content = await response.read()
-                    # 使用chardet检测编码
+                    # Use chardet to detect encoding
                     detected = chardet.detect(content)
                     encoding = detected['encoding'] if detected['encoding'] else 'utf-8'
                     html = content.decode(encoding, errors='replace')
                 
-                # 检查是否有错误指示
+                # Check for error indicators
                 has_error = (any(indicator.lower() in html.lower() for indicator in error_indicators) and len(html.split()) < 64) or len(html) < 50 or len(html.split()) < 20
                 # has_error = len(html.split()) < 64
                 if has_error:
@@ -592,9 +590,9 @@ async def fetch_page_content_async(urls: List[str], use_jina: bool = False, jina
             else:
                 results = await asyncio.gather(*tasks)
             
-            return {url: result for url, result in zip(urls, results)}  # 返回字典而不是协程对象
+            return {url: result for url, result in zip(urls, results)}  # Return a dictionary instead of a coroutine object
 
-    return await process_urls()  # 确保等待异步操作完成
+    return await process_urls()  # Ensure waiting for async operations to complete
 
 async def extract_pdf_text_async(url: str, session: aiohttp.ClientSession) -> str:
     """

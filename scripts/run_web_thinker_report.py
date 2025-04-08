@@ -529,7 +529,7 @@ async def process_single_sequence(
                     )
                     
                     # Update article
-                    section_content = section_content.replace('## Section Name: ', '## ').split('### Conclusion')[0].split('### 结论')[0].strip('\n').strip()
+                    section_content = section_content.replace('## Section Name: ', '## ').split('### Conclusion')[0].split('### Conclusion')[0].strip('\n').strip()
                     section_content = re.sub(r'## Section \d+:', '##', section_content)
                     article += f"\n{section_content}\n\n"
                     
@@ -610,7 +610,7 @@ async def process_single_sequence(
             # Handle search query operation (existing logic)
             search_query = extract_between(response, BEGIN_SEARCH_QUERY, END_SEARCH_QUERY)
             
-            if search_query is None or len(search_query) <= 5: # 太短了，不合法的query
+            if search_query is None or len(search_query) <= 5: # Too short, invalid query
                 continue
 
             if search_query in seq['executed_search_queries']:
@@ -631,7 +631,7 @@ async def process_single_sequence(
                 max_tokens=args.max_tokens // 2,
             )
 
-            # 执行搜索和后续操作（同原逻辑）
+            # Execute search and subsequent operations (same as original logic)
             if search_query in search_cache:
                 results = search_cache[search_query]
             else:
@@ -753,7 +753,7 @@ async def process_single_sequence(
             print(f"---Returned search results:---\n{extracted_info}\n")
 
         else:
-            # 如果不是上述任何一种结束标志，则返回了EOS，直接结束
+            # If it's not any of the above ending flags, an EOS was returned, end directly
             print("---Returned EOS, generation finished.---")
             seq['finished'] = True
             break

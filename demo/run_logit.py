@@ -342,7 +342,7 @@ async def generate_deep_web_explorer(
 async def run_search_chain(env, new_step):
     print("in search chain")
     search_query = extract_between(new_step, env.BEGIN_SEARCH_QUERY, env.END_SEARCH_QUERY)
-    if search_query is None or len(search_query) <= 5: # 太短了，不合法的query
+    if search_query is None or len(search_query) <= 5: # Too short, invalid query
         yield False, 'Current search query is too short, skip'
     else:
         if search_query in env.executed_search_queries:

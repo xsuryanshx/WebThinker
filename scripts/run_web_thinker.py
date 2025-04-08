@@ -393,7 +393,7 @@ async def process_single_sequence(
 ) -> Dict:
     """Process a single sequence through its entire reasoning chain with MAX_TOKENS limit"""
     
-    # 初始化 token 计数器，初始值设为 prompt 的 token 数（简单用 split() 作为近似）
+    # Initialize token counter, initial value set to the token count of the prompt (simply using split() as an approximation)
     MAX_TOKENS = 20000
     total_tokens = len(seq['prompt'].split())
     
@@ -433,7 +433,7 @@ async def process_single_sequence(
         search_query = extract_between(response, BEGIN_SEARCH_QUERY, END_SEARCH_QUERY)
 
         if seq['search_count'] < args.max_search_limit and total_tokens < MAX_TOKENS:
-            if search_query is None or len(search_query) <= 5: # 太短了，不合法的query
+            if search_query is None or len(search_query) <= 5: # Too short, invalid query
                 continue
 
             if search_query in seq['executed_search_queries']:
@@ -453,7 +453,7 @@ async def process_single_sequence(
                 semaphore=semaphore,
             )
 
-            # 执行搜索和后续操作（同原逻辑）
+            # Execute search and subsequent operations (same as original logic)
             if search_query in search_cache:
                 results = search_cache[search_query]
             else:

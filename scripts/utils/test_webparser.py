@@ -5,47 +5,47 @@ from urllib.parse import urljoin
 class WebParserClient:
     def __init__(self, base_url: str = "http://localhost:8000"):
         """
-        初始化Web解析器客户端
+        Initialize the Web Parser Client
         
         Args:
-            base_url: API服务器的基础URL，默认为本地测试服务器
+            base_url: Base URL of the API server, defaults to local test server
         """
         self.base_url = base_url.rstrip('/')
         
     def parse_urls(self, urls: List[str]) -> List[Dict[str, Union[str, bool]]]:
         """
-        发送URL列表到解析服务器并获取解析结果
+        Send URL list to parsing server and get parsing results
         
         Args:
-            urls: 需要解析的URL列表
+            urls: List of URLs to parse
             
         Returns:
-            解析结果列表
+            List of parsing results
             
         Raises:
-            requests.exceptions.RequestException: 当API请求失败时
+            requests.exceptions.RequestException: When API request fails
         """
         endpoint = urljoin(self.base_url, "/parse_urls")
         response = requests.post(endpoint, json={"urls": urls})
-        response.raise_for_status()  # 如果响应状态码不是200，抛出异常
+        response.raise_for_status()  # Raise exception if response status code is not 200
         
         return response.json()["results"]
 
 
-# 使用示例
+# Usage example
 if __name__ == "__main__":
-    # 创建客户端实例（如果API运行在其他服务器上，请修改base_url）
+    # Create client instance (if API is running on another server, please modify base_url)
     client = WebParserClient("http://xxxx")
     
-    # 测试URL列表
+    # Test URL list
     test_urls = [
         "http://xxxx",
     ]
     
     try:
-        # 调用API解析URL
+        # Call API to parse URLs
         results = client.parse_urls(test_urls)
         print(results[1]['content'])
 
     except requests.exceptions.RequestException as e:
-        print(f"API调用失败: {str(e)}") 
+        print(f"API call failed: {str(e)}") 
